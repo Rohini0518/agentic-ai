@@ -23,7 +23,7 @@ export async function helloGemini(): Promise<HelloOutput> {
   });
 
   return {
-    ok: true,
+    ok: true, 
     provider: "gemini",
     model,
     message: response.text ?? "NA",

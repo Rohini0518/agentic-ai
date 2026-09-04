@@ -4,7 +4,7 @@ import { helloGemini, helloGroq } from "./provider";
 loadEnvFile();
 
 async function modelProvider() {
-  const provider = process.env.PROVIDER;
+  const provider = process.env.LLM_PROVIDER;
 console.log("provider",provider)
   let result;
   if (provider === "gemini") {
