@@ -15,7 +15,7 @@ export function createChatModel(preferredProvider?: Provider) {
   if (preferredProvider === "google" || (!preferredProvider && hasGemini)) {
     return {
       provider: "google" as const,
-      model: new ChatGoogleGenerativeAI({ ...base, model: "gemini-2.5-flash" }),
+      model: new ChatGoogleGenerativeAI({ ...base, model: "gemini-3.6-flash" }),
     };
   }
 

@@ -14,6 +14,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 
 type Answer = {
+  question: string;
   summary: string;
   confidence: number;
 };
@@ -42,7 +43,7 @@ export const FirstChatAi = () => {
         throw new Error(data.error || "Something went wrong");
       }
 
-      setAnswers((prev) => [data, ...prev]);
+      setAnswers((prev) => [{ ...data, question: query }, ...prev]);
       setQuery("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to get an answer");
@@ -82,11 +83,20 @@ export const FirstChatAi = () => {
           ) : (
             <div className="flex flex-col gap-3">
               {answers.map((ans, ind) => (
+                <div key={ind}>
+                  <div
+                  className="rounded-lg border border-border bg-blue-100 p-3 mb-2"
+                >
+                  <p className="text-sm font-semibold text-foreground">
+                    {ans.question}
+                  </p>
+                </div>
+
                 <div
-                  key={ind}
                   className="rounded-lg border border-border bg-muted/40 p-3"
                 >
-                  <p className="text-sm leading-relaxed text-foreground">
+            
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {ans.summary}
                   </p>
                   <div className="mt-2 flex items-center gap-2">
@@ -102,6 +112,7 @@ export const FirstChatAi = () => {
                       {Math.round(ans.confidence * 100)}% confidence
                     </span>
                   </div>
+                </div>
                 </div>
               ))}
             </div>
