@@ -1,29 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Send, Sparkles } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
-
-type Answer = {
-  question: string;
-  summary: string;
-  confidence: number;
-};
+import { useEffect, useRef, useState } from "react";
+import { Sparkles } from "lucide-react";
+import { Card, CardContent, CardFooter } from "./ui/card";
+import { ChatHero } from "./ChatHero";
+import { ChatMessage } from "./ChatMessage";
+import { ChatInput } from "./ChatInput";
+import type { Answer } from "@/lib/types";
 
 export const FirstChatAi = () => {
   const [query, setQuery] = useState("");
-  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [answers, setAnswers] = useState<Answer[]>([
+    { question: "hello", summary: "Hello,How Are You Today.", confidence: 0.9 },
+
+  ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [answers.length]);
 
   const handleAsk = async () => {
     if (!query.trim() || loading) return;
@@ -39,11 +36,11 @@ export const FirstChatAi = () => {
       });
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data.summary || typeof data.confidence !== "number") {
         throw new Error(data.error || "Something went wrong");
       }
 
-      setAnswers((prev) => [{ ...data, question: query }, ...prev]);
+      setAnswers((prev) => [...prev, { ...data, question: query }]);
       setQuery("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to get an answer");
@@ -52,27 +49,12 @@ export const FirstChatAi = () => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAsk();
-    }
-  };
-
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Sparkles className="size-5 text-primary" />
-            Ask AI
-          </CardTitle>
-          <CardDescription>
-            Ask a question and get an instant AI-generated answer.
-          </CardDescription>
-        </CardHeader>
+    <div className="mx-auto flex h-full w-full max-w-2xl min-h-0 flex-col gap-4 p-4">
+      <ChatHero />
 
-        <CardContent className="flex flex-col gap-3">
+      <Card className="min-h-0 flex-1 shadow-lg">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pt-6">
           {answers.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border py-10 text-center">
               <Sparkles className="size-6 text-muted-foreground" />
@@ -81,40 +63,11 @@ export const FirstChatAi = () => {
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {answers.map((ans, ind) => (
-                <div key={ind}>
-                  <div
-                  className="rounded-lg border border-border bg-blue-100 p-3 mb-2"
-                >
-                  <p className="text-sm font-semibold text-foreground">
-                    {ans.question}
-                  </p>
-                </div>
-
-                <div
-                  className="rounded-lg border border-border bg-muted/40 p-3"
-                >
-            
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {ans.summary}
-                  </p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="h-1.5 w-full max-w-32 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{
-                          width: `${Math.round(ans.confidence * 100)}%`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {Math.round(ans.confidence * 100)}% confidence
-                    </span>
-                  </div>
-                </div>
-                </div>
+                <ChatMessage key={ind} answer={ans} />
               ))}
+              <div ref={bottomRef} />
             </div>
           )}
 
@@ -122,31 +75,12 @@ export const FirstChatAi = () => {
         </CardContent>
 
         <CardFooter className="flex-col items-stretch gap-2 border-t bg-transparent p-4">
-          <Textarea
+          <ChatInput
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your question..."
-            className="min-h-20 resize-none"
-            disabled={loading}
+            onChange={setQuery}
+            onSend={handleAsk}
+            loading={loading}
           />
-          <Button
-            onClick={handleAsk}
-            disabled={loading || !query.trim()}
-            className="self-end"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Asking...
-              </>
-            ) : (
-              <>
-                <Send className="size-4" />
-                Ask
-              </>
-            )}
-          </Button>
         </CardFooter>
       </Card>
     </div>

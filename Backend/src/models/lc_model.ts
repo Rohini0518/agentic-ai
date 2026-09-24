@@ -1,32 +1,23 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatGroq } from "@langchain/groq";
-import { loadEnvFile } from "../env";
+import { env } from "../shared/env";
 
-loadEnvFile();
-
-export type Provider = "google" | "groq";
+export type Provider = "gemini" | "groq";
 
 const base = { temperature: 0.3 } as const;
 
-export function createChatModel(preferredProvider?: Provider) {
-  const hasGemini = !!process.env.GEMINI_API_KEY;
-  const hasGroq = !!process.env.GROQ_API_KEY;
-
-  if (preferredProvider === "google" || (!preferredProvider && hasGemini)) {
+export function createChatModel(preferredProvider: Provider = env.LLM_PROVIDER) {
+  if (preferredProvider === "gemini") {
+    if (!env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set in .env");
     return {
-      provider: "google" as const,
-      model: new ChatGoogleGenerativeAI({ ...base, model: "gemini-3.6-flash" }),
+      provider: "gemini" as const,
+      model: new ChatGoogleGenerativeAI({ ...base, model: env.GEMINI_MODEL }),
     };
   }
 
-  if (preferredProvider === "groq" || (!preferredProvider && hasGroq)) {
-    return {
-      provider: "groq" as const,
-      model: new ChatGroq({ ...base, model: "llama-3.3-70b-versatile" }),
-    };
-  }
-
-  throw new Error(
-    "No LLM provider API key found. Set GEMINI_API_KEY or GROQ_API_KEY in .env"
-  );
+  if (!env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is not set in .env");
+  return {
+    provider: "groq" as const,
+    model: new ChatGroq({ ...base, model: env.GROQ_MODEL }),
+  };
 }

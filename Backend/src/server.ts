@@ -1,10 +1,8 @@
-import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { loadEnvFile } from "./env";
+import { env } from "./shared/env";
 import { askStructured } from "./ask-core";
 
-loadEnvFile();
 const app = express();
 
 app.use(
@@ -37,8 +35,6 @@ app.post("/askmodel", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 9000;
-
-app.listen(PORT, () => {
-  console.log(`Backend is running in port ${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`Backend is running in port ${env.PORT}`);
 });

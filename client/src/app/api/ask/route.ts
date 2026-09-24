@@ -18,6 +18,6 @@ export async function POST(req: NextRequest) {
   catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.log("error", message);
-    return NextResponse.json({ error: `Error Occured ${message}` });
+    return NextResponse.json({ error: `Error Occured ${message}` }, { status: 502 });
   }
 }
