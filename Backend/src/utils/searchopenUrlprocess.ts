@@ -45,7 +45,7 @@ export async function openUrl(url: string) {
     ]
   }):raw
 //step:5
-const cleaned=collapseWhitespace(text);
+const cleaned=removeWhitespace(text);
 const capped=cleaned.slice(0,8000);
 return OpenUrlOutputSchema.parse({
     url:normalizedUrl,
@@ -54,9 +54,17 @@ return OpenUrlOutputSchema.parse({
 }
 
 
-function collapseWhitespace(text:string){
-const removespace=text.replace(/\s+/g,"").trim();
-return removespace;
+export  function removeWhitespace (text:string){
+  return text
+    .replace(/\r\n/g,"\n")              // windows line endings -> \n
+    .replace(/ /g," ")             // non-breaking spaces -> normal space
+    .replace(/[​-‍﻿]/g,"") // invisible zero-width characters
+    .replace(/[ \t]+/g," ")             // many spaces/tabs -> one space
+    .split("\n")
+    .map(line=>line.trim())             // trim each line
+    .filter(line=>line.length>0)        // drop empty lines
+    .join("\n")
+    .trim();
 }
 function validateUrl(url: string) {
   try {
