@@ -38,6 +38,7 @@ export async function searchTavilyUtil(
       include_images: false,
     }),
   });
+
   if (!response.ok) {
     throw new Error(`Tavily search failed: ${response.status}`);
   }
@@ -58,3 +59,9 @@ export async function searchTavilyUtil(
 
   return SearchResultListSchema.parse(cleanedresult);
 }
+
+//.parse()  100% from Zod. parse() = The Security Bouncer
+//.parse() is a synchronous validation method 
+// in Zod that forces unknown data through a predefined schema. It acts as a strict gateway: 
+// it returns the typed data if it matches all schema rules, or immediately throws a ZodError if any rule is broken.
+

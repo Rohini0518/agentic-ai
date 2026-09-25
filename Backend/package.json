@@ -20,6 +20,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "groq-sdk": "^1.6.0",
+    "html-to-text": "^10.0.1",
     "langchain": "^1.5.10",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "@types/html-to-text": "^9.0.4"
   }
 }
