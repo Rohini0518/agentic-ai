@@ -31,3 +31,11 @@ export const SummarizeInputSchema=z.object({
 export const SummarizeOutputSchema=z.object({
     summary:z.string().min(1)
 });
+
+
+export const searchInputRunnableSchema=z.object({
+    query:z.string().min(5,"Please ask a specific query"),
+
+})
+
+export type SearchInputRunnable=z.infer<typeof searchInputRunnableSchema>
